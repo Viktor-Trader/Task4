@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Users
+from .forms import UsersForm
 
 def front(request):
     users = Users.objects.all()
@@ -11,4 +12,18 @@ def about(request):
 
 
 def registration(request):
-    return render(request, 'main/registration.html')
+    error = ''
+    if request.method == 'POST':
+        form = UsersForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+        else:
+            error = 'error in filling out the registration form'
+
+    form = UsersForm()
+    context = {
+        'form': form,
+        'error': error
+    }
+    return render(request, 'main/registration.html', context)
